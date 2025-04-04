@@ -1,11 +1,11 @@
 
-import { Instagram, Facebook, Twitter, Youtube, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Youtube, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-10">
           <div>
             <h3 className="text-xl font-bold mb-4 font-playfair">Chen Rui</h3>
             <p className="text-gray-400 mb-6">
@@ -39,32 +39,21 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-bold mb-4">Support</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Shipping & Returns</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Care Instructions</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Color Chart</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-            </ul>
-          </div>
-          
-          <div>
             <h4 className="font-bold mb-4">Contact</h4>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <MapPin size={20} className="text-marker-green mr-3 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-400">123 Art Street, Creative District, NY 10001, USA</span>
-              </li>
-              <li className="flex items-center">
-                <Phone size={20} className="text-marker-green mr-3 flex-shrink-0" />
-                <span className="text-gray-400">+1 (555) 123-4567</span>
-              </li>
-              <li className="flex items-center">
-                <Mail size={20} className="text-marker-green mr-3 flex-shrink-0" />
-                <span className="text-gray-400">support@chenrui.com</span>
-              </li>
-            </ul>
+            <div className="flex items-center mb-4">
+              <Mail size={20} className="text-marker-green mr-3 flex-shrink-0" />
+              <span className="text-gray-400">support@chenrui.com</span>
+            </div>
+            <h4 className="font-bold mb-4 mt-6">Refund Policy</h4>
+            <div className="text-gray-400 text-sm">
+              <p className="mb-2">We want you to be fully satisfied with your purchase. If you're not happy with your order, you may request a refund within 14 days of delivery.</p>
+              <p className="mb-2">To be eligible for a refund:</p>
+              <ul className="list-disc pl-5 mb-2 space-y-1">
+                <li>The item must be unused and in its original packaging.</li>
+                <li>You must contact us first to initiate the return.</li>
+              </ul>
+              <p>Please note: Return shipping costs are the responsibility of the customer. Once we receive the returned item and confirm its condition, we will issue a full refund to your original payment method.</p>
+            </div>
           </div>
         </div>
         
