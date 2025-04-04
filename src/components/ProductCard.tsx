@@ -51,7 +51,10 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
           </Button>
         </div>
         <div className="absolute top-3 right-3 bg-marker-green text-white rounded-full w-16 h-16 flex items-center justify-center text-sm font-bold">
-          {product.colors} Colors
+          <div className="text-center">
+            <div>{product.colors}</div>
+            <div className="text-xs">Colors</div>
+          </div>
         </div>
       </div>
       <div className="p-6 flex-grow">
