@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check } from 'lucide-react';
 
@@ -10,6 +10,7 @@ export interface Product {
   price: number;
   image: string;
   colors: number;
+  variantId?: string; // Add variantId for Shopify integration
 }
 
 interface ProductCardProps {
@@ -20,6 +21,101 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [shopifyReady, setShopifyReady] = useState(false);
+
+  // Initialize Shopify functionality
+  useEffect(() => {
+    // Load Shopify Buy Button SDK
+    const scriptURL = 'https://sdks.shopifycdn.com/js-buy-sdk/v2/latest/index.umd.min.js';
+    
+    if (window.ShopifyBuy) {
+      setShopifyReady(true);
+    } else {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = scriptURL;
+      script.onload = () => {
+        if (window.ShopifyBuy) {
+          initShopify();
+          setShopifyReady(true);
+        }
+      };
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
+
+  const initShopify = () => {
+    if (!window.shopifyClient) {
+      window.shopifyClient = window.ShopifyBuy.buildClient({
+        domain: 'xhff96-za.myshopify.com',
+        storefrontAccessToken: '125f370af7dcf0b5362dad09fbf29769',
+      });
+
+      // Create checkout
+      window.shopifyClient.checkout.create().then((checkout: any) => {
+        window.shopifyCheckout = checkout;
+      });
+    }
+  };
+
+  // Map product colors to Shopify variant IDs
+  const getVariantId = (colors: number) => {
+    switch (colors) {
+      case 48:
+        return 'gid://shopify/ProductVariant/43717016387618';
+      case 60:
+        return 'gid://shopify/ProductVariant/43717016420386';
+      case 80:
+        return 'gid://shopify/ProductVariant/43717016453154';
+      case 120:
+        return 'gid://shopify/ProductVariant/43717016485922';
+      default:
+        return '';
+    }
+  };
+
+  const addToShopifyCart = () => {
+    if (!window.shopifyClient || !window.shopifyCheckout) {
+      console.error('Shopify client not initialized');
+      return;
+    }
+    
+    const variantId = getVariantId(product.colors);
+    
+    if (!variantId) {
+      console.error('No variant ID found for this product');
+      return;
+    }
+
+    const lineItemsToAdd = [
+      {
+        variantId: variantId,
+        quantity: 1,
+      },
+    ];
+
+    window.shopifyClient.checkout.addLineItems(window.shopifyCheckout.id, lineItemsToAdd)
+      .then((checkout: any) => {
+        window.location.href = checkout.webUrl;
+      })
+      .catch((error: any) => {
+        console.error('Error adding item to Shopify cart:', error);
+      });
+  };
+
+  const handleAddToCart = () => {
+    // First add to our internal cart
+    onAddToCart(product);
+    
+    // Then add to Shopify cart
+    if (shopifyReady) {
+      addToShopifyCart();
+    }
+  };
 
   return (
     <div 
@@ -35,7 +131,7 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
         />
         <div className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <Button
-            onClick={() => onAddToCart(product)}
+            onClick={handleAddToCart}
             className={`btn-animated ${isInCart ? 'bg-marker-black hover:bg-marker-black/90' : 'bg-marker-green hover:bg-marker-green/90'} text-white rounded-full`}
             disabled={isInCart}
           >
@@ -66,7 +162,7 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
             variant="outline"
             size="sm"
             className="text-xs md:hidden"
-            onClick={() => onAddToCart(product)}
+            onClick={handleAddToCart}
             disabled={isInCart}
           >
             {isInCart ? 'Added' : 'Add to Cart'}
