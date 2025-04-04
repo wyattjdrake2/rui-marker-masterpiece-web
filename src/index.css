@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,16 +16,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 134 47% 34%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 60 65% 65%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 134 47% 94%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -35,19 +38,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -96,6 +92,150 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-foreground font-montserrat overflow-x-hidden;
   }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-playfair;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply backdrop-blur-lg bg-white/90 shadow-lg;
+  }
+  
+  .color-badge {
+    @apply w-6 h-6 rounded-full inline-block mx-1 border border-gray-200 shadow-sm;
+  }
+  
+  .color-badge.green {
+    @apply bg-marker-green;
+  }
+  
+  .color-badge.blue {
+    @apply bg-marker-blue;
+  }
+  
+  .color-badge.purple {
+    @apply bg-marker-purple;
+  }
+  
+  .color-badge.pink {
+    @apply bg-marker-pink;
+  }
+  
+  .color-badge.yellow {
+    @apply bg-marker-yellow;
+  }
+  
+  .color-badge.orange {
+    @apply bg-marker-orange;
+  }
+
+  .marker-line {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .marker-line::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 6px;
+    bottom: 0;
+    left: 0;
+    background-color: #A5CF4F;
+    z-index: -1;
+    animation: draw-line 1.5s ease-out 0.5s forwards;
+  }
+  
+  .btn-animated {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+  
+  .btn-animated::before {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full skew-x-12;
+    transition: transform 0.6s ease;
+  }
+  
+  .btn-animated:hover::before {
+    @apply transform translate-x-full;
+  }
+  
+  .product-card {
+    @apply bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300;
+  }
+  
+  .product-card:hover {
+    @apply shadow-xl transform -translate-y-1;
+  }
+  
+  .cart-item-enter {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  
+  .cart-item-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .cart-item-exit {
+    opacity: 1;
+  }
+  
+  .cart-item-exit-active {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .testimonial-card {
+    @apply p-6 rounded-xl shadow-md relative;
+    background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  }
+  
+  .testimonial-card::before {
+    content: """;
+    @apply text-7xl text-marker-green/20 absolute -top-2 -left-1 font-playfair;
+  }
+
+  .image-reveal {
+    clip-path: inset(0 100% 0 0);
+    animation: image-reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  }
+
+  @keyframes image-reveal {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  .color-strip {
+    @apply h-1 w-full flex;
+  }
+
+  .color-strip div {
+    @apply h-full flex-1;
+  }
+
+  .sticky-nav {
+    @apply fixed top-0 left-0 right-0 z-50 transition-all duration-300;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+}
+
+#root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
 }
