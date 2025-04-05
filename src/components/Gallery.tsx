@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, X } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 const Gallery = () => {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
@@ -18,11 +18,12 @@ const Gallery = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="relative rounded-xl overflow-hidden shadow-xl">
+          {/* Updated main video image */}
+          <div className="relative rounded-xl overflow-hidden shadow-xl aspect-video">
             <img 
               src="/lovable-uploads/a3f645a6-e454-43b7-b74a-10efeed99903.png" 
               alt="Vibrant Art with Chen Rui Markers" 
-              className="w-full h-auto object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <Button 
@@ -34,31 +35,33 @@ const Gallery = () => {
             </div>
           </div>
 
+          {/* Static image grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl overflow-hidden shadow-lg">
               <img 
                 src="/lovable-uploads/9c19dd5e-e031-47b6-98f2-674eed9661bc.png" 
                 alt="Color Variety" 
-                className="w-full h-auto object-cover"
+                className="w-full h-auto"
               />
             </div>
             <div className="rounded-xl overflow-hidden shadow-lg">
               <img 
                 src="/lovable-uploads/42b91411-ce6d-4aa1-9385-99563bb9e62e.png" 
                 alt="Marker Tip Detail" 
-                className="w-full h-auto object-cover"
+                className="w-full h-auto"
               />
             </div>
             <div className="rounded-xl overflow-hidden shadow-lg col-span-2">
               <img 
                 src="/lovable-uploads/aa103952-f952-4839-9623-87ae240669fa.png" 
                 alt="Dual Tips Features" 
-                className="w-full h-auto object-cover"
+                className="w-full h-auto"
               />
             </div>
           </div>
         </div>
 
+        {/* Features section */}
         <div className="bg-white p-8 rounded-xl shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
@@ -99,20 +102,20 @@ const Gallery = () => {
       {/* Video Modal */}
       {videoModalOpen && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-4 w-full max-w-3xl relative">
-            <button 
-              onClick={() => setVideoModalOpen(false)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-black"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="aspect-video rounded overflow-hidden">
-              <video
-                src="/chenrui video.mp4"
-                controls
-                autoPlay
-                className="w-full h-full object-contain rounded"
-              />
+          <div className="bg-white rounded-xl p-4 w-full max-w-3xl">
+            <div className="aspect-video bg-black rounded overflow-hidden shadow-lg mb-4">
+              <video controls autoPlay className="w-full h-full">
+                <source src="/chenrui video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className="flex justify-end">
+              <Button 
+                variant="outline"
+                onClick={() => setVideoModalOpen(false)}
+              >
+                Close
+              </Button>
             </div>
           </div>
         </div>
@@ -122,3 +125,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
