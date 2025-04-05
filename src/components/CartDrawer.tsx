@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
 import { Product } from './ProductCard';
@@ -35,7 +35,8 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
-  const handleCheckout = () => {
+  // Memoize the checkout handler to avoid recreation on each render
+  const handleCheckout = useCallback(() => {
     if (!window.shopifyCheckout || cartItems.length === 0) {
       toast.error("Unable to proceed to checkout");
       return;
@@ -44,21 +45,34 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
     setIsCheckingOut(true);
     toast.info("Redirecting to checkout...");
 
-    // Redirect to Shopify checkout
-    try {
-      window.location.href = window.shopifyCheckout.webUrl;
-    } catch (error) {
-      console.error("Error redirecting to checkout:", error);
-      setIsCheckingOut(false);
-      toast.error("Failed to redirect to checkout");
-    }
-  };
+    // Use a short timeout to ensure the UI updates before redirect
+    setTimeout(() => {
+      try {
+        // Store checkout state in sessionStorage as a fallback
+        sessionStorage.setItem('cart_checkout_pending', 'true');
+        window.location.href = window.shopifyCheckout.webUrl;
+      } catch (error) {
+        console.error("Error redirecting to checkout:", error);
+        setIsCheckingOut(false);
+        sessionStorage.removeItem('cart_checkout_pending');
+        toast.error("Failed to redirect to checkout");
+      }
+    }, 100);
+  }, [cartItems]);
 
   // Reset checkout state on component unmount
   useEffect(() => {
     return () => {
       setIsCheckingOut(false);
     };
+  }, []);
+
+  // Check for any pending checkout state on mount
+  useEffect(() => {
+    const pendingCheckout = sessionStorage.getItem('cart_checkout_pending');
+    if (pendingCheckout === 'true') {
+      sessionStorage.removeItem('cart_checkout_pending');
+    }
   }, []);
 
   if (!isOpen && !animateIn) return null;
