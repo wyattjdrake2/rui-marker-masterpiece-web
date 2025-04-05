@@ -20,8 +20,14 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
   useEffect(() => {
     if (isOpen) {
       setAnimateIn(true);
+      // Reset checkout state when cart is opened
+      setIsCheckingOut(false);
     } else {
       setAnimateIn(false);
+      // Also reset checkout state when cart is closed
+      setTimeout(() => {
+        if (!isOpen) setIsCheckingOut(false);
+      }, 300); // Match the drawer animation duration
     }
   }, [isOpen]);
 
@@ -47,6 +53,13 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
       toast.error("Failed to redirect to checkout");
     }
   };
+
+  // Reset checkout state on component unmount
+  useEffect(() => {
+    return () => {
+      setIsCheckingOut(false);
+    };
+  }, []);
 
   if (!isOpen && !animateIn) return null;
 
