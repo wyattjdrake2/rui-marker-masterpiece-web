@@ -35,29 +35,92 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
+  // Map product colors to Shopify variant IDs
+  const getVariantId = (colors: number) => {
+    switch (colors) {
+      case 48:
+        return 'gid://shopify/ProductVariant/43717016387618';
+      case 60:
+        return 'gid://shopify/ProductVariant/43717016420386';
+      case 80:
+        return 'gid://shopify/ProductVariant/43717016453154';
+      case 120:
+        return 'gid://shopify/ProductVariant/43717016485922';
+      default:
+        return '';
+    }
+  };
+
+  // Create a new Shopify checkout with current cart items
+  const createNewShopifyCheckout = async () => {
+    if (!window.shopifyClient || cartItems.length === 0) {
+      return null;
+    }
+
+    try {
+      // Create a new checkout
+      const checkout = await window.shopifyClient.checkout.create();
+      console.log('Created new Shopify checkout:', checkout.id);
+      
+      // Prepare line items from current cart
+      const lineItems = cartItems.map(item => ({
+        variantId: getVariantId(item.colors),
+        quantity: 1,
+      })).filter(item => item.variantId);
+      
+      if (lineItems.length === 0) {
+        toast.error("No valid items in cart");
+        return null;
+      }
+      
+      // Add all items to the checkout at once
+      const updatedCheckout = await window.shopifyClient.checkout.addLineItems(
+        checkout.id,
+        lineItems
+      );
+      
+      console.log('Added all items to new checkout');
+      return updatedCheckout;
+    } catch (error) {
+      console.error("Error creating new checkout:", error);
+      toast.error("Failed to prepare checkout");
+      return null;
+    }
+  };
+
   // Memoize the checkout handler to avoid recreation on each render
-  const handleCheckout = useCallback(() => {
-    if (!window.shopifyCheckout || cartItems.length === 0) {
-      toast.error("Unable to proceed to checkout");
+  const handleCheckout = useCallback(async () => {
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
       return;
     }
 
     setIsCheckingOut(true);
-    toast.info("Redirecting to checkout...");
+    toast.info("Preparing checkout...");
 
-    // Use a short timeout to ensure the UI updates before redirect
-    setTimeout(() => {
-      try {
-        // Store checkout state in sessionStorage as a fallback
-        sessionStorage.setItem('cart_checkout_pending', 'true');
-        window.location.href = window.shopifyCheckout.webUrl;
-      } catch (error) {
-        console.error("Error redirecting to checkout:", error);
+    try {
+      // Create a new checkout with current cart items
+      const newCheckout = await createNewShopifyCheckout();
+      
+      if (!newCheckout) {
         setIsCheckingOut(false);
-        sessionStorage.removeItem('cart_checkout_pending');
-        toast.error("Failed to redirect to checkout");
+        return;
       }
-    }, 100);
+      
+      // Store the new checkout globally
+      window.shopifyCheckout = newCheckout;
+      
+      // Store checkout state in sessionStorage as a fallback
+      sessionStorage.setItem('cart_checkout_pending', 'true');
+      
+      // Redirect to the checkout URL
+      window.location.href = newCheckout.webUrl;
+    } catch (error) {
+      console.error("Error during checkout process:", error);
+      setIsCheckingOut(false);
+      sessionStorage.removeItem('cart_checkout_pending');
+      toast.error("Failed to redirect to checkout");
+    }
   }, [cartItems]);
 
   // Reset checkout state on component unmount

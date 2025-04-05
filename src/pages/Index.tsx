@@ -16,6 +16,34 @@ const Index = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
+  // Initialize Shopify functionality
+  useEffect(() => {
+    if (window.ShopifyBuy) {
+      initShopify();
+    } else {
+      // The script is already loaded in index.html, but we'll check if it's ready
+      const checkInterval = setInterval(() => {
+        if (window.ShopifyBuy) {
+          clearInterval(checkInterval);
+          initShopify();
+        }
+      }, 100);
+
+      // Clear interval after 10 seconds if still not loaded to avoid memory leaks
+      setTimeout(() => clearInterval(checkInterval), 10000);
+    }
+  }, []);
+
+  const initShopify = () => {
+    if (!window.shopifyClient) {
+      window.shopifyClient = window.ShopifyBuy.buildClient({
+        domain: 'xhff96-za.myshopify.com',
+        storefrontAccessToken: '125f370af7dcf0b5362dad09fbf29769',
+      });
+      console.log('Shopify client initialized');
+    }
+  };
+  
   const products: Product[] = [
     {
       id: "1",
