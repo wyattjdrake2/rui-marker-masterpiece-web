@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface Product {
   id: string;
@@ -95,16 +97,16 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
       window.shopifyClient.checkout.create().then((checkout: any) => {
         window.shopifyCheckout = checkout;
         console.log('New checkout created:', checkout.id);
-        addItemAndRedirect();
+        addItemToCart();
       }).catch((error: any) => {
         console.error('Error creating new checkout:', error);
       });
     } else {
-      addItemAndRedirect();
+      addItemToCart();
     }
   };
 
-  const addItemAndRedirect = () => {
+  const addItemToCart = () => {
     const variantId = getVariantId(product.colors);
     
     if (!variantId) {
@@ -123,11 +125,13 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
 
     window.shopifyClient.checkout.addLineItems(window.shopifyCheckout.id, lineItemsToAdd)
       .then((checkout: any) => {
-        console.log('Item added to cart, redirecting to:', checkout.webUrl);
-        window.location.href = checkout.webUrl;
+        console.log('Item added to cart successfully');
+        // No redirection here
+        toast.success(`${product.name} added to cart`);
       })
       .catch((error: any) => {
         console.error('Error adding item to Shopify cart:', error);
+        toast.error("Failed to add item to cart");
       });
   };
 
@@ -137,7 +141,7 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
     
     console.log('Add to cart clicked for product:', product.name);
     
-    // Then add to Shopify cart
+    // Then add to Shopify cart without redirecting
     addToShopifyCart();
   };
 

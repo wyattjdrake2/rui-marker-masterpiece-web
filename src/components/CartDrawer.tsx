@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
 import { Product } from './ProductCard';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -15,6 +15,7 @@ interface CartDrawerProps {
 
 const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: CartDrawerProps) => {
   const [animateIn, setAnimateIn] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -29,17 +30,22 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
   const total = subtotal + tax;
 
   const handleCheckout = () => {
-    // In a real app, this would redirect to Shopify or another checkout system
-    toast({
-      title: "Redirecting to checkout",
-      description: "In a production environment, this would connect to Shopify",
-    });
-    
-    // Simulate checkout completion
-    setTimeout(() => {
-      clearCart();
-      onClose();
-    }, 1500);
+    if (!window.shopifyCheckout || cartItems.length === 0) {
+      toast.error("Unable to proceed to checkout");
+      return;
+    }
+
+    setIsCheckingOut(true);
+    toast.info("Redirecting to checkout...");
+
+    // Redirect to Shopify checkout
+    try {
+      window.location.href = window.shopifyCheckout.webUrl;
+    } catch (error) {
+      console.error("Error redirecting to checkout:", error);
+      setIsCheckingOut(false);
+      toast.error("Failed to redirect to checkout");
+    }
   };
 
   if (!isOpen && !animateIn) return null;
@@ -132,14 +138,16 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
               className="w-full bg-marker-green hover:bg-marker-green/90 btn-animated" 
               size="lg"
               onClick={handleCheckout}
+              disabled={isCheckingOut}
             >
-              Checkout
+              {isCheckingOut ? 'Redirecting...' : 'Checkout'}
             </Button>
             
             <Button 
               variant="ghost" 
               className="w-full mt-2 text-gray-500" 
               onClick={clearCart}
+              disabled={isCheckingOut}
             >
               Clear Cart
             </Button>
