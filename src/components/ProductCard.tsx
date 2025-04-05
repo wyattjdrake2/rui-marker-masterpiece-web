@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check } from 'lucide-react';
@@ -25,22 +24,21 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
 
   // Initialize Shopify functionality
   useEffect(() => {
-    // Load Shopify Buy Button SDK
-    const scriptURL = 'https://sdks.shopifycdn.com/js-buy-sdk/v2/latest/index.umd.min.js';
-    
     if (window.ShopifyBuy) {
+      initShopify();
       setShopifyReady(true);
     } else {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = scriptURL;
-      script.onload = () => {
+      // The script is already loaded in index.html, but we'll check if it's ready
+      const checkInterval = setInterval(() => {
         if (window.ShopifyBuy) {
+          clearInterval(checkInterval);
           initShopify();
           setShopifyReady(true);
         }
-      };
-      document.head.appendChild(script);
+      }, 100);
+
+      // Clear interval after 10 seconds if still not loaded to avoid memory leaks
+      setTimeout(() => clearInterval(checkInterval), 10000);
     }
 
     return () => {
@@ -58,6 +56,9 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
       // Create checkout
       window.shopifyClient.checkout.create().then((checkout: any) => {
         window.shopifyCheckout = checkout;
+        console.log('Shopify checkout created:', checkout.id);
+      }).catch((error: any) => {
+        console.error('Error creating Shopify checkout:', error);
       });
     }
   };
@@ -79,17 +80,39 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
   };
 
   const addToShopifyCart = () => {
-    if (!window.shopifyClient || !window.shopifyCheckout) {
+    console.log('Adding to Shopify cart...');
+    
+    if (!window.shopifyClient) {
       console.error('Shopify client not initialized');
+      initShopify(); // Try to initialize if not ready yet
       return;
     }
     
+    if (!window.shopifyCheckout || !window.shopifyCheckout.id) {
+      console.error('Shopify checkout not created yet');
+      
+      // Create a new checkout and then add items
+      window.shopifyClient.checkout.create().then((checkout: any) => {
+        window.shopifyCheckout = checkout;
+        console.log('New checkout created:', checkout.id);
+        addItemAndRedirect();
+      }).catch((error: any) => {
+        console.error('Error creating new checkout:', error);
+      });
+    } else {
+      addItemAndRedirect();
+    }
+  };
+
+  const addItemAndRedirect = () => {
     const variantId = getVariantId(product.colors);
     
     if (!variantId) {
       console.error('No variant ID found for this product');
       return;
     }
+
+    console.log('Adding item with variantId:', variantId);
 
     const lineItemsToAdd = [
       {
@@ -100,6 +123,7 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
 
     window.shopifyClient.checkout.addLineItems(window.shopifyCheckout.id, lineItemsToAdd)
       .then((checkout: any) => {
+        console.log('Item added to cart, redirecting to:', checkout.webUrl);
         window.location.href = checkout.webUrl;
       })
       .catch((error: any) => {
@@ -111,10 +135,10 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
     // First add to our internal cart
     onAddToCart(product);
     
+    console.log('Add to cart clicked for product:', product.name);
+    
     // Then add to Shopify cart
-    if (shopifyReady) {
-      addToShopifyCart();
-    }
+    addToShopifyCart();
   };
 
   return (
