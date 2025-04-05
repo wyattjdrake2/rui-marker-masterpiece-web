@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
@@ -101,17 +100,16 @@ const Gallery = () => {
       {videoModalOpen && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-4 w-full max-w-3xl">
-            <div className="aspect-video bg-gray-200 rounded flex items-center justify-center mb-4">
-              <div className="text-center p-10">
-                <p className="text-lg font-medium">Video placeholder</p>
-                <p className="text-sm text-gray-500">A product demonstration video would be displayed here</p>
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <Button 
-                variant="outline"
-                onClick={() => setVideoModalOpen(false)}
-              >
+            <video
+              className="w-full h-auto rounded-lg"
+              controls
+              autoPlay
+            >
+              <source src="/chenrui%20video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={() => setVideoModalOpen(false)}>
                 Close
               </Button>
             </div>
@@ -123,3 +121,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
