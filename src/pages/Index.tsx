@@ -79,11 +79,30 @@ const Index = () => {
     }
   ];
 
-  const addToCart = (product: Product) => {
-    if (!cartItems.some(item => item.id === product.id)) {
-      setCartItems([...cartItems, product]);
-      toast.success(`${product.name} added to cart`);
+  const addToCart = (product: Product, quantity: number) => {
+    // If the product is already in the cart, show a message
+    if (cartItems.some(item => item.id === product.id)) {
+      toast.info(`${product.name} is already in your cart`);
+      return;
     }
+    
+    // Add the product with quantity to cart
+    const productWithQuantity = {
+      ...product,
+      quantity: quantity
+    };
+    
+    setCartItems([...cartItems, productWithQuantity]);
+    toast.success(`${quantity} × ${product.name} added to cart`);
+  };
+
+  const updateCartItemQuantity = (productId: string, newQuantity: number) => {
+    setCartItems(cartItems.map(item => 
+      item.id === productId 
+        ? { ...item, quantity: newQuantity } 
+        : item
+    ));
+    toast.info("Cart updated");
   };
 
   const removeFromCart = (productId: string) => {
@@ -130,6 +149,7 @@ const Index = () => {
         cartItems={cartItems}
         removeFromCart={removeFromCart}
         clearCart={clearCart}
+        updateQuantity={updateCartItemQuantity}
       />
     </div>
   );

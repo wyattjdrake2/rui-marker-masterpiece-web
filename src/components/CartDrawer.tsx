@@ -1,7 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, ShoppingBag, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { Product } from './ProductCard';
 import { toast } from 'sonner';
 
@@ -11,9 +12,10 @@ interface CartDrawerProps {
   cartItems: Product[];
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
+  updateQuantity: (productId: string, quantity: number) => void;
 }
 
-const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: CartDrawerProps) => {
+const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, updateQuantity }: CartDrawerProps) => {
   const [animateIn, setAnimateIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -31,7 +33,8 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
     }
   }, [isOpen]);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  // Calculate subtotal based on price and quantity
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
@@ -65,7 +68,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
       // Prepare line items from current cart
       const lineItems = cartItems.map(item => ({
         variantId: getVariantId(item.colors),
-        quantity: 1,
+        quantity: item.quantity || 1,
       })).filter(item => item.variantId);
       
       if (lineItems.length === 0) {
@@ -88,6 +91,13 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
     }
   };
 
+  // Handle quantity changes
+  const handleQuantityChange = (productId: string, newQuantity: number) => {
+    if (newQuantity > 0 && newQuantity <= 99) {
+      updateQuantity(productId, newQuantity);
+    }
+  };
+
   // Memoize the checkout handler to avoid recreation on each render
   const handleCheckout = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -99,7 +109,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
     toast.info("Preparing checkout...");
 
     try {
-      // Create a new checkout with current cart items
+      // Always create a new checkout with current cart items to avoid stale checkout sessions
       const newCheckout = await createNewShopifyCheckout();
       
       if (!newCheckout) {
@@ -199,7 +209,43 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart }: C
                       </Button>
                     </div>
                     <p className="text-sm text-gray-500">{item.colors} Colors</p>
-                    <div className="mt-2 font-medium">${item.price.toFixed(2)}</div>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center space-x-2">
+                        <Button 
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7 p-0"
+                          onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1)}
+                          disabled={isCheckingOut || (item.quantity || 1) <= 1}
+                        >
+                          <Minus size={14} />
+                        </Button>
+                        
+                        <Input
+                          type="number"
+                          min="1"
+                          max="99"
+                          value={item.quantity || 1}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            if (!isNaN(val)) handleQuantityChange(item.id, val);
+                          }}
+                          className="h-7 w-12 text-center p-0"
+                          disabled={isCheckingOut}
+                        />
+                        
+                        <Button 
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7 p-0"
+                          onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1)}
+                          disabled={isCheckingOut || (item.quantity || 1) >= 99}
+                        >
+                          <Plus size={14} />
+                        </Button>
+                      </div>
+                      <div className="font-medium">${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+                    </div>
                   </div>
                 </div>
               ))}

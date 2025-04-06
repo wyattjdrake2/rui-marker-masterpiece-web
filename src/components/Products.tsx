@@ -5,7 +5,7 @@ import ProductCard from './ProductCard';
 interface ProductsProps {
   products: Product[];
   cartItems: Product[];
-  addToCart: (product: Product) => void;
+  addToCart: (product: Product, quantity: number) => void;
 }
 
 const Products = ({ products, cartItems, addToCart }: ProductsProps) => {

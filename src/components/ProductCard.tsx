@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ShoppingCart, Check, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface Product {
@@ -11,21 +12,39 @@ export interface Product {
   price: number;
   image: string;
   colors: number;
-  variantId?: string; // Add variantId for Shopify integration
+  variantId?: string;
+  quantity?: number;
 }
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
   isInCart: boolean;
 }
 
 const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
-    // Only add to our internal cart
-    onAddToCart(product);
+    onAddToCart({...product, quantity}, quantity);
+  };
+
+  const incrementQuantity = () => {
+    setQuantity(prev => Math.min(prev + 1, 99));
+  };
+
+  const decrementQuantity = () => {
+    setQuantity(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0 && value <= 99) {
+      setQuantity(value);
+    } else if (e.target.value === '') {
+      setQuantity(1);
+    }
   };
 
   return (
@@ -40,7 +59,34 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
           alt={product.name} 
           className="w-full h-64 object-contain p-4"
         />
-        <div className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 bg-black/60 flex flex-col items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="flex items-center gap-2 mb-4 bg-white/20 p-2 rounded-md">
+            <Button 
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 bg-white text-black"
+              onClick={decrementQuantity}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            
+            <Input
+              type="text"
+              value={quantity}
+              onChange={handleQuantityChange}
+              className="h-8 w-16 text-center text-white bg-black/50 border-gray-600"
+            />
+            
+            <Button 
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 bg-white text-black"
+              onClick={incrementQuantity}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <Button
             onClick={handleAddToCart}
             className={`btn-animated ${isInCart ? 'bg-marker-black hover:bg-marker-black/90' : 'bg-marker-green hover:bg-marker-green/90'} text-white rounded-full`}
@@ -69,15 +115,34 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
         <p className="text-gray-600 mb-4">{product.description}</p>
         <div className="flex justify-between items-center">
           <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs md:hidden"
-            onClick={handleAddToCart}
-            disabled={isInCart}
-          >
-            {isInCart ? 'Added' : 'Add to Cart'}
-          </Button>
+          <div className="flex items-center gap-2 md:hidden">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={decrementQuantity}
+            >
+              <Minus className="h-3 w-3" />
+            </Button>
+            <span className="text-sm">{quantity}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={incrementQuantity}
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={handleAddToCart}
+              disabled={isInCart}
+            >
+              {isInCart ? 'Added' : 'Add'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
