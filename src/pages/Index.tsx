@@ -12,10 +12,17 @@ import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
 import { toast } from 'sonner';
 import { Truck } from 'lucide-react';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
+
+// Exchange rate - in a real app, this would come from an API
+const CAD_TO_USD_RATE = 0.74; // Example rate: 1 CAD = 0.74 USD
+
+export type Currency = "CAD" | "USD";
 
 const Index = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [currency, setCurrency] = useState<Currency>("CAD"); // Default to CAD
   
   // Initialize Shopify functionality
   useEffect(() => {
@@ -43,6 +50,12 @@ const Index = () => {
       });
       console.log('Shopify client initialized');
     }
+  };
+  
+  // Convert price from CAD to the selected currency
+  const convertPrice = (cadPrice: number): number => {
+    if (currency === "CAD") return cadPrice;
+    return Number((cadPrice * CAD_TO_USD_RATE).toFixed(2));
   };
   
   const products: Product[] = [
@@ -81,6 +94,28 @@ const Index = () => {
     }
   ];
 
+  // Convert products with current currency
+  const productsWithCurrentCurrency = products.map(product => ({
+    ...product,
+    price: convertPrice(product.price),
+    originalPrice: product.price
+  }));
+
+  const handleCurrencyChange = (newCurrency: Currency) => {
+    setCurrency(newCurrency);
+    toast.success(`Currency changed to ${newCurrency}`);
+    
+    // Update cart items prices when currency changes
+    setCartItems(currentItems => 
+      currentItems.map(item => ({
+        ...item,
+        price: newCurrency === "CAD" 
+          ? (item.originalPrice || item.price / CAD_TO_USD_RATE)
+          : (item.originalPrice || item.price) * CAD_TO_USD_RATE
+      }))
+    );
+  };
+
   const addToCart = (product: Product, quantity: number) => {
     // If the product is already in the cart, show a message
     if (cartItems.some(item => item.id === product.id)) {
@@ -91,7 +126,8 @@ const Index = () => {
     // Add the product with quantity to cart
     const productWithQuantity = {
       ...product,
-      quantity: quantity
+      quantity: quantity,
+      originalPrice: currency === "USD" ? product.price / CAD_TO_USD_RATE : product.price
     };
     
     setCartItems([...cartItems, productWithQuantity]);
@@ -145,10 +181,24 @@ const Index = () => {
         <span>LIMITED TIME: Free Express Delivery on All Orders! Ships within 24 hours</span>
       </div>
       
-      <Navbar cartItemCount={cartItems.length} openCart={() => setIsCartOpen(true)} />
+      <Navbar 
+        cartItemCount={cartItems.length} 
+        openCart={() => setIsCartOpen(true)} 
+        currencySwitcher={
+          <CurrencySwitcher 
+            currency={currency} 
+            onCurrencyChange={handleCurrencyChange} 
+          />
+        }
+      />
       <Hero />
       <Features />
-      <Products products={products} cartItems={cartItems} addToCart={addToCart} />
+      <Products 
+        products={productsWithCurrentCurrency} 
+        cartItems={cartItems} 
+        addToCart={addToCart}
+        currency={currency}
+      />
       <Gallery />
       <Testimonials />
       <Footer />
@@ -159,6 +209,7 @@ const Index = () => {
         removeFromCart={removeFromCart}
         clearCart={clearCart}
         updateQuantity={updateCartItemQuantity}
+        currency={currency}
       />
     </div>
   );
