@@ -35,11 +35,12 @@ const CartDrawer = ({
     0
   );
 
-  const shipping = cartItems.length > 0 ? 0 : 0;
+  // Fixed shipping cost
+  const shipping = cartItems.length > 0 ? 0 : 0; // Free shipping
   const total = subtotal + shipping;
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader className="mb-5">
           <div className="flex items-center justify-between">
