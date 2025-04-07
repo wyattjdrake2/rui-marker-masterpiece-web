@@ -18,9 +18,8 @@ const Gallery = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* LEFT COLUMN — Video + Chart stacked tightly */}
-          <div className="flex flex-col gap-4">
-            {/* Video Section */}
+          {/* LEFT: Video + Color Chart */}
+          <div className="flex flex-col gap-8">
             <div className="relative rounded-xl overflow-hidden shadow-xl aspect-video">
               <img 
                 src="/lovable-uploads/a3f645a6-e454-43b7-b74a-10efeed99903.png" 
@@ -37,17 +36,21 @@ const Gallery = () => {
               </div>
             </div>
 
-            {/* Color Chart Section */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {/* Color Chart moved here inside left column */}
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <h3 className="text-xl font-bold mb-2 text-center">Complete Color Chart</h3>
+              <p className="text-sm text-gray-600 mb-4 text-center">
+                Explore the full spectrum of 120 vibrant colors available in our largest set
+              </p>
               <img 
                 src="/lovable-uploads/06f344d3-78cd-460b-9972-5d08a88cf5cc.png" 
                 alt="Chen Rui 120 Color Chart" 
-                className="w-full h-auto object-contain"
+                className="w-full h-auto rounded-lg shadow"
               />
             </div>
           </div>
 
-          {/* RIGHT COLUMN — Image grid */}
+          {/* RIGHT: Static Image Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl overflow-hidden shadow-lg">
               <img 
@@ -137,3 +140,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
