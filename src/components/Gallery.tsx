@@ -62,7 +62,7 @@ const Gallery = () => {
           </div>
         </div>
         
-        {/* Color Chart Section - Moved to the desired position */}
+        {/* Color Chart Section - Positioned in the gap below the video */}
         <div className="mb-16 bg-white p-8 rounded-xl shadow-lg">
           <h3 className="text-2xl font-bold mb-4 text-center">Complete Color Chart</h3>
           <p className="text-gray-600 mb-8 text-center">

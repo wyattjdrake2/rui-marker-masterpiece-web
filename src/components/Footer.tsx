@@ -34,7 +34,7 @@ const Footer = () => {
             <h4 className="font-bold mb-4">Contact</h4>
             <div className="flex items-center mb-4">
               <Mail size={20} className="text-marker-green mr-3 flex-shrink-0" />
-              <span className="text-gray-400">support@chenru.ca</span>
+              <span className="text-gray-400">support@chenrui.ca</span>
             </div>
             <h4 className="font-bold mb-4 mt-6">Refund Policy</h4>
             <div className="text-gray-400 text-sm">
@@ -102,7 +102,7 @@ const Footer = () => {
             </ul>
             
             <h3 className="font-bold mt-6">4. Your Rights</h3>
-            <p>If you are located in the EU, you have the right to access, correct, or delete your personal data. Please contact us at support@chenru.ca for any requests.</p>
+            <p>If you are located in the EU, you have the right to access, correct, or delete your personal data. Please contact us at support@chenrui.ca for any requests.</p>
             
             <h3 className="font-bold mt-6">5. Data Retention</h3>
             <p>We retain your information for our records unless and until you ask us to delete it.</p>
@@ -110,7 +110,7 @@ const Footer = () => {
             <h3 className="font-bold mt-6">6. Changes to This Policy</h3>
             <p>We may update this policy from time to time to reflect operational, legal, or regulatory reasons.</p>
             
-            <p className="mt-6">For questions, contact us at support@chenru.ca.</p>
+            <p className="mt-6">For questions, contact us at support@chenrui.ca.</p>
           </div>
         </DialogContent>
       </Dialog>
@@ -148,7 +148,7 @@ const Footer = () => {
             <h3 className="font-bold mt-6">7. Governing Law</h3>
             <p>These terms shall be governed by the laws of your jurisdiction.</p>
             
-            <p className="mt-6">If you have questions, please contact us at support@chenru.ca.</p>
+            <p className="mt-6">If you have questions, please contact us at support@chenrui.ca.</p>
           </div>
         </DialogContent>
       </Dialog>
