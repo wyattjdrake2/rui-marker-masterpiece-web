@@ -38,7 +38,7 @@ const Index = () => {
   const initShopify = () => {
     if (!window.shopifyClient) {
       window.shopifyClient = window.ShopifyBuy.buildClient({
-        domain: 'xhff96-za.myshopify.com',
+        domain: 'chenrui.ca',
         storefrontAccessToken: '125f370af7dcf0b5362dad09fbf29769',
       });
       console.log('Shopify client initialized');
