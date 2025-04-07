@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
@@ -97,6 +98,21 @@ const Gallery = () => {
             </div>
           </div>
         </div>
+        
+        {/* Color Chart Section */}
+        <div className="mt-16 bg-white p-8 rounded-xl shadow-lg">
+          <h3 className="text-2xl font-bold mb-4 text-center">Complete Color Chart</h3>
+          <p className="text-gray-600 mb-8 text-center">
+            Explore the full spectrum of 120 vibrant colors available in our largest set
+          </p>
+          <div className="flex justify-center">
+            <img 
+              src="/lovable-uploads/06f344d3-78cd-460b-9972-5d08a88cf5cc.png" 
+              alt="Chen Rui 120 Color Chart" 
+              className="max-w-full h-auto rounded-lg shadow-xl"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Video Modal */}
@@ -125,4 +141,3 @@ const Gallery = () => {
 };
 
 export default Gallery;
-

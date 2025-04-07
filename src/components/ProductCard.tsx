@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Check, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Check, Plus, Minus, Award } from 'lucide-react';
 import { toast } from 'sonner';
+import { Badge } from './ui/badge';
 
 export interface Product {
   id: string;
@@ -14,6 +15,7 @@ export interface Product {
   colors: number;
   variantId?: string;
   quantity?: number;
+  bestValue?: boolean;
 }
 
 interface ProductCardProps {
@@ -103,12 +105,29 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
             )}
           </Button>
         </div>
+        
         <div className="absolute top-3 right-3 bg-marker-green text-white rounded-full w-16 h-16 flex items-center justify-center text-sm font-bold">
           <div className="text-center">
             <div>{product.colors}</div>
             <div className="text-xs">Colors</div>
           </div>
         </div>
+        
+        {/* Almost Sold Out Badge */}
+        <div className="absolute top-3 left-3">
+          <Badge className="bg-red-500 text-white px-2 py-1 text-xs font-semibold">
+            Almost Sold Out!
+          </Badge>
+        </div>
+        
+        {/* Best Value Badge */}
+        {product.bestValue && (
+          <div className="absolute bottom-3 left-3">
+            <Badge className="bg-amber-500 text-white px-3 py-1 flex items-center gap-1">
+              <Award className="h-3 w-3" /> BEST VALUE
+            </Badge>
+          </div>
+        )}
       </div>
       <div className="p-6 flex-grow">
         <h3 className="text-xl font-bold mb-2">{product.name}</h3>

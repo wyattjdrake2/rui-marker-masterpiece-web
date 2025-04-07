@@ -11,6 +11,7 @@ import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
 import { toast } from 'sonner';
+import { Truck } from 'lucide-react';
 
 const Index = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
@@ -49,7 +50,7 @@ const Index = () => {
       id: "1",
       name: "Chen Rui 48 Colors Set",
       description: "Perfect starter set with a broad range of essential colors. Ideal for beginners and hobbyists.",
-      price: 34.99,
+      price: 59.99,
       image: "/lovable-uploads/52f8aea2-090f-43ab-a928-945cb9e31062.png",
       colors: 48
     },
@@ -57,7 +58,7 @@ const Index = () => {
       id: "2",
       name: "Chen Rui 60 Colors Set",
       description: "Extended color palette with additional hues for more versatile artwork and creative projects.",
-      price: 43.99,
+      price: 79.99,
       image: "/lovable-uploads/e4fb0ade-f9a4-4ac7-90f2-59bc913c7249.png",
       colors: 60
     },
@@ -65,7 +66,7 @@ const Index = () => {
       id: "3",
       name: "Chen Rui 80 Colors Set",
       description: "Comprehensive set for professionals with a wide spectrum of colors for advanced techniques.",
-      price: 59.99,
+      price: 94.99,
       image: "/lovable-uploads/9c19dd5e-e031-47b6-98f2-674eed9661bc.png",
       colors: 80
     },
@@ -73,9 +74,10 @@ const Index = () => {
       id: "4",
       name: "Chen Rui 120 Colors Set",
       description: "Ultimate collection with the complete color range. Studio-grade quality for serious artists.",
-      price: 79.99,
+      price: 109.99,
       image: "/lovable-uploads/42b91411-ce6d-4aa1-9385-99563bb9e62e.png",
-      colors: 120
+      colors: 120,
+      bestValue: true
     }
   ];
 
@@ -136,6 +138,13 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Toaster position="top-right" richColors />
+      
+      {/* Free Delivery Banner */}
+      <div className="bg-marker-green text-white py-2 px-4 text-center font-medium flex items-center justify-center gap-2">
+        <Truck className="h-4 w-4" />
+        <span>LIMITED TIME: Free Express Delivery on All Orders! Ships within 24 hours</span>
+      </div>
+      
       <Navbar cartItemCount={cartItems.length} openCart={() => setIsCartOpen(true)} />
       <Hero />
       <Features />
