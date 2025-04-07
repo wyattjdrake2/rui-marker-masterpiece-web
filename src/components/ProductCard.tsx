@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { ShoppingCart, Check, Plus, Minus, Award } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from './ui/badge';
-import { Currency } from '@/pages/Index';
 
 export interface Product {
   id: string;
@@ -17,17 +16,15 @@ export interface Product {
   variantId?: string;
   quantity?: number;
   bestValue?: boolean;
-  originalPrice?: number;
 }
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, quantity: number) => void;
   isInCart: boolean;
-  currency?: Currency;
 }
 
-const ProductCard = ({ product, onAddToCart, isInCart, currency = "CAD" }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -136,7 +133,7 @@ const ProductCard = ({ product, onAddToCart, isInCart, currency = "CAD" }: Produ
         <h3 className="text-xl font-bold mb-2">{product.name}</h3>
         <p className="text-gray-600 mb-4">{product.description}</p>
         <div className="flex justify-between items-center">
-          <span className="text-2xl font-bold">{currency} ${product.price.toFixed(2)}</span>
+          <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
           <div className="flex items-center gap-2 md:hidden">
             <Button
               variant="outline"

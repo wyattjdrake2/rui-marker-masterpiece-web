@@ -1,16 +1,14 @@
 
 import { Product } from './ProductCard';
 import ProductCard from './ProductCard';
-import { Currency } from '@/pages/Index';
 
 interface ProductsProps {
   products: Product[];
   cartItems: Product[];
   addToCart: (product: Product, quantity: number) => void;
-  currency: Currency;
 }
 
-const Products = ({ products, cartItems, addToCart, currency }: ProductsProps) => {
+const Products = ({ products, cartItems, addToCart }: ProductsProps) => {
   const isInCart = (productId: string) => cartItems.some(item => item.id === productId);
 
   return (
@@ -21,8 +19,7 @@ const Products = ({ products, cartItems, addToCart, currency }: ProductsProps) =
             <span className="marker-line">Our Premium Collections</span>
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Choose the perfect marker set for your artistic endeavors, from beginner collections to professional studio sets.
-            <span className="block mt-2 font-medium">All prices shown in {currency}</span>
+            Choose the perfect marker set for your artistic endeavors, from beginner collections to professional studio sets
           </p>
         </div>
 
@@ -33,7 +30,6 @@ const Products = ({ products, cartItems, addToCart, currency }: ProductsProps) =
                 product={product} 
                 onAddToCart={addToCart} 
                 isInCart={isInCart(product.id)} 
-                currency={currency}
               />
             </div>
           ))}

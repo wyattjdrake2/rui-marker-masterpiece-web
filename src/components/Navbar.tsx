@@ -6,10 +6,9 @@ import { Button } from '@/components/ui/button';
 interface NavbarProps {
   cartItemCount: number;
   openCart: () => void;
-  currencySwitcher?: React.ReactNode;
 }
 
-const Navbar = ({ cartItemCount, openCart, currencySwitcher }: NavbarProps) => {
+const Navbar = ({ cartItemCount, openCart }: NavbarProps) => {
   const [isSticky, setIsSticky] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -43,9 +42,6 @@ const Navbar = ({ cartItemCount, openCart, currencySwitcher }: NavbarProps) => {
           <a href="#products" className="font-medium hover:text-marker-green transition-colors">Products</a>
           <a href="#gallery" className="font-medium hover:text-marker-green transition-colors">Gallery</a>
           <a href="#testimonials" className="font-medium hover:text-marker-green transition-colors">Testimonials</a>
-          
-          {currencySwitcher}
-          
           <Button 
             onClick={openCart}
             variant="outline" 
@@ -63,8 +59,6 @@ const Navbar = ({ cartItemCount, openCart, currencySwitcher }: NavbarProps) => {
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center space-x-4">
-          {currencySwitcher}
-          
           <Button 
             onClick={openCart}
             variant="outline" 

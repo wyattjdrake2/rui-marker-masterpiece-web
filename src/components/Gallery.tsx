@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
@@ -21,7 +20,6 @@ const Gallery = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* LEFT: Video + Color Chart */}
           <div className="flex flex-col gap-8">
-            {/* Video Thumbnail */}
             <div className="relative rounded-xl overflow-hidden shadow-xl aspect-video">
               <img 
                 src="/lovable-uploads/a3f645a6-e454-43b7-b74a-10efeed99903.png" 
@@ -38,7 +36,7 @@ const Gallery = () => {
               </div>
             </div>
 
-            {/* Color Chart */}
+            {/* Color Chart moved here inside left column */}
             <div className="bg-white p-6 rounded-xl shadow-md">
               <h3 className="text-xl font-bold mb-2 text-center">Complete Color Chart</h3>
               <p className="text-sm text-gray-600 mb-4 text-center">
@@ -142,3 +140,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
