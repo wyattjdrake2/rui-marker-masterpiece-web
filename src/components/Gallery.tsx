@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
@@ -19,24 +18,39 @@ const Gallery = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* Updated main video image */}
-          <div className="relative rounded-xl overflow-hidden shadow-xl aspect-video">
-            <img 
-              src="/lovable-uploads/a3f645a6-e454-43b7-b74a-10efeed99903.png" 
-              alt="Vibrant Art with Chen Rui Markers" 
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Button 
-                className="w-16 h-16 rounded-full bg-black/60 hover:bg-black/80 text-white border-2 border-white/70 shadow-xl animate-pulse"
-                onClick={() => setVideoModalOpen(true)}
-              >
-                <Play className="h-6 w-6 fill-white" />
-              </Button>
+          {/* LEFT: Video + Color Chart */}
+          <div className="flex flex-col gap-8">
+            <div className="relative rounded-xl overflow-hidden shadow-xl aspect-video">
+              <img 
+                src="/lovable-uploads/a3f645a6-e454-43b7-b74a-10efeed99903.png" 
+                alt="Vibrant Art with Chen Rui Markers" 
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Button 
+                  className="w-16 h-16 rounded-full bg-black/60 hover:bg-black/80 text-white border-2 border-white/70 shadow-xl animate-pulse"
+                  onClick={() => setVideoModalOpen(true)}
+                >
+                  <Play className="h-6 w-6 fill-white" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Color Chart moved here inside left column */}
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <h3 className="text-xl font-bold mb-2 text-center">Complete Color Chart</h3>
+              <p className="text-sm text-gray-600 mb-4 text-center">
+                Explore the full spectrum of 120 vibrant colors available in our largest set
+              </p>
+              <img 
+                src="/lovable-uploads/06f344d3-78cd-460b-9972-5d08a88cf5cc.png" 
+                alt="Chen Rui 120 Color Chart" 
+                className="w-full h-auto rounded-lg shadow"
+              />
             </div>
           </div>
 
-          {/* Static image grid */}
+          {/* RIGHT: Static Image Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl overflow-hidden shadow-lg">
               <img 
@@ -61,23 +75,8 @@ const Gallery = () => {
             </div>
           </div>
         </div>
-        
-        {/* Color Chart Section - Positioned in the gap below the video */}
-        <div className="mb-16 bg-white p-8 rounded-xl shadow-lg">
-          <h3 className="text-2xl font-bold mb-4 text-center">Complete Color Chart</h3>
-          <p className="text-gray-600 mb-8 text-center">
-            Explore the full spectrum of 120 vibrant colors available in our largest set
-          </p>
-          <div className="flex justify-center">
-            <img 
-              src="/lovable-uploads/06f344d3-78cd-460b-9972-5d08a88cf5cc.png" 
-              alt="Chen Rui 120 Color Chart" 
-              className="max-w-full h-auto rounded-lg shadow-xl"
-            />
-          </div>
-        </div>
 
-        {/* Features section */}
+        {/* FEATURES SECTION */}
         <div className="bg-white p-8 rounded-xl shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
@@ -141,3 +140,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
