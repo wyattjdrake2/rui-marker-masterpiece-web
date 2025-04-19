@@ -1,10 +1,10 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { Product } from './ProductCard';
 import { toast } from 'sonner';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -18,27 +18,24 @@ interface CartDrawerProps {
 const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, updateQuantity }: CartDrawerProps) => {
   const [animateIn, setAnimateIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const { currency, convertPrice } = useCurrency();
 
   useEffect(() => {
     if (isOpen) {
       setAnimateIn(true);
-      // Reset checkout state when cart is opened
       setIsCheckingOut(false);
     } else {
       setAnimateIn(false);
-      // Also reset checkout state when cart is closed
       setTimeout(() => {
         if (!isOpen) setIsCheckingOut(false);
-      }, 300); // Match the drawer animation duration
+      }, 300);
     }
   }, [isOpen]);
 
-  // Calculate subtotal based on price and quantity
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + convertPrice(item.price) * (item.quantity || 1), 0);
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
-  // Map product colors to Shopify variant IDs
   const getVariantId = (colors: number) => {
     switch (colors) {
       case 48:
@@ -54,18 +51,15 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     }
   };
 
-  // Create a new Shopify checkout with current cart items
   const createNewShopifyCheckout = async () => {
     if (!window.shopifyClient || cartItems.length === 0) {
       return null;
     }
 
     try {
-      // Create a new checkout
       const checkout = await window.shopifyClient.checkout.create();
       console.log('Created new Shopify checkout:', checkout.id);
       
-      // Prepare line items from current cart
       const lineItems = cartItems.map(item => ({
         variantId: getVariantId(item.colors),
         quantity: item.quantity || 1,
@@ -76,7 +70,6 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
         return null;
       }
       
-      // Add all items to the checkout at once
       const updatedCheckout = await window.shopifyClient.checkout.addLineItems(
         checkout.id,
         lineItems
@@ -91,14 +84,12 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     }
   };
 
-  // Handle quantity changes
   const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity > 0 && newQuantity <= 99) {
       updateQuantity(productId, newQuantity);
     }
   };
 
-  // Memoize the checkout handler to avoid recreation on each render
   const handleCheckout = useCallback(async () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
@@ -109,7 +100,6 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     toast.info("Preparing checkout...");
 
     try {
-      // Always create a new checkout with current cart items to avoid stale checkout sessions
       const newCheckout = await createNewShopifyCheckout();
       
       if (!newCheckout) {
@@ -117,13 +107,9 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
         return;
       }
       
-      // Store the new checkout globally
       window.shopifyCheckout = newCheckout;
-      
-      // Store checkout state in sessionStorage as a fallback
       sessionStorage.setItem('cart_checkout_pending', 'true');
       
-      // Redirect to the checkout URL
       window.location.href = newCheckout.webUrl;
     } catch (error) {
       console.error("Error during checkout process:", error);
@@ -133,14 +119,12 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     }
   }, [cartItems]);
 
-  // Reset checkout state on component unmount
   useEffect(() => {
     return () => {
       setIsCheckingOut(false);
     };
   }, []);
 
-  // Check for any pending checkout state on mount
   useEffect(() => {
     const pendingCheckout = sessionStorage.getItem('cart_checkout_pending');
     if (pendingCheckout === 'true') {
@@ -244,7 +228,9 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
                           <Plus size={14} />
                         </Button>
                       </div>
-                      <div className="font-medium">${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+                      <div className="font-medium">
+                        {currency === 'CAD' ? 'CAD' : 'USD'} ${(convertPrice(item.price) * (item.quantity || 1)).toFixed(2)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -257,7 +243,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
           <div className="p-6 border-t">
             <div className="space-y-2 mb-6">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-gray-600">Subtotal ({currency})</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
@@ -265,7 +251,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
                 <span>${tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                <span>Total</span>
+                <span>Total ({currency})</span>
                 <span>${total.toFixed(2)}</span>
               </div>
             </div>

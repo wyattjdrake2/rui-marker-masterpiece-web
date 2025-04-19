@@ -12,6 +12,8 @@ import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
 import { toast } from 'sonner';
 import { Truck } from 'lucide-react';
+import { CurrencyProvider } from '@/contexts/CurrencyContext';
+import CurrencySelector from '@/components/CurrencySelector';
 
 const Index = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
@@ -136,31 +138,36 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
-      <Toaster position="bottom-right" richColors />
-      
-      {/* Free Delivery Banner */}
-      <div className="bg-marker-green text-white py-2 px-4 text-center font-medium flex items-center justify-center gap-2">
-        <Truck className="h-4 w-4" />
-        <span>LIMITED TIME: Free Express Delivery on All Orders! Ships within 24 hours</span>
+    <CurrencyProvider>
+      <div className="min-h-screen">
+        <Toaster position="bottom-right" richColors />
+        
+        {/* Free Delivery Banner with Currency Selector */}
+        <div className="bg-marker-green text-white py-2 px-4 text-center font-medium flex items-center justify-between">
+          <div className="flex items-center justify-center gap-2">
+            <Truck className="h-4 w-4" />
+            <span>LIMITED TIME: Free Express Delivery on All Orders! Ships within 24 hours</span>
+          </div>
+          <CurrencySelector />
+        </div>
+        
+        <Navbar cartItemCount={cartItems.length} openCart={() => setIsCartOpen(true)} />
+        <Hero />
+        <Features />
+        <Products products={products} cartItems={cartItems} addToCart={addToCart} />
+        <Gallery />
+        <Testimonials />
+        <Footer />
+        <CartDrawer 
+          isOpen={isCartOpen} 
+          onClose={() => setIsCartOpen(false)} 
+          cartItems={cartItems}
+          removeFromCart={removeFromCart}
+          clearCart={clearCart}
+          updateQuantity={updateCartItemQuantity}
+        />
       </div>
-      
-      <Navbar cartItemCount={cartItems.length} openCart={() => setIsCartOpen(true)} />
-      <Hero />
-      <Features />
-      <Products products={products} cartItems={cartItems} addToCart={addToCart} />
-      <Gallery />
-      <Testimonials />
-      <Footer />
-      <CartDrawer 
-        isOpen={isCartOpen} 
-        onClose={() => setIsCartOpen(false)} 
-        cartItems={cartItems}
-        removeFromCart={removeFromCart}
-        clearCart={clearCart}
-        updateQuantity={updateCartItemQuantity}
-      />
-    </div>
+    </CurrencyProvider>
   );
 };
 

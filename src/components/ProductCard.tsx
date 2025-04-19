@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ShoppingCart, Check, Plus, Minus, Award } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from './ui/badge';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 export interface Product {
   id: string;
@@ -27,6 +27,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const { currency, convertPrice } = useCurrency();
 
   const handleAddToCart = () => {
     onAddToCart({...product, quantity}, quantity);
@@ -48,6 +49,8 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
       setQuantity(1);
     }
   };
+
+  const displayPrice = convertPrice(product.price);
 
   return (
     <div 
@@ -113,14 +116,12 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
           </div>
         </div>
         
-        {/* Almost Sold Out Badge */}
         <div className="absolute top-3 left-3">
           <Badge className="bg-red-500 text-white px-2 py-1 text-xs font-semibold">
             Almost Sold Out!
           </Badge>
         </div>
         
-        {/* Best Value Badge */}
         {product.bestValue && (
           <div className="absolute bottom-3 left-3">
             <Badge className="bg-amber-500 text-white px-3 py-1 flex items-center gap-1">
@@ -133,7 +134,9 @@ const ProductCard = ({ product, onAddToCart, isInCart }: ProductCardProps) => {
         <h3 className="text-xl font-bold mb-2">{product.name}</h3>
         <p className="text-gray-600 mb-4">{product.description}</p>
         <div className="flex justify-between items-center">
-          <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
+          <span className="text-2xl font-bold">
+            {currency === 'CAD' ? 'CAD' : 'USD'} ${displayPrice.toFixed(2)}
+          </span>
           <div className="flex items-center gap-2 md:hidden">
             <Button
               variant="outline"
