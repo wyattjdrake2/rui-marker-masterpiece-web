@@ -1,14 +1,8 @@
-
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface NavbarProps {
-  cartItemCount: number;
-  openCart: () => void;
-}
-
-const Navbar = ({ cartItemCount, openCart }: NavbarProps) => {
+const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,36 +36,10 @@ const Navbar = ({ cartItemCount, openCart }: NavbarProps) => {
           <a href="#products" className="font-medium hover:text-marker-green transition-colors">Products</a>
           <a href="#gallery" className="font-medium hover:text-marker-green transition-colors">Gallery</a>
           <a href="#testimonials" className="font-medium hover:text-marker-green transition-colors">Testimonials</a>
-          <Button 
-            onClick={openCart}
-            variant="outline" 
-            className="flex items-center gap-2 bg-white/80 hover:bg-white border border-gray-200"
-          >
-            <ShoppingCart size={18} />
-            <span>Cart</span>
-            {cartItemCount > 0 && (
-              <span className="inline-flex items-center justify-center w-5 h-5 bg-marker-green text-white text-xs rounded-full">
-                {cartItemCount}
-              </span>
-            )}
-          </Button>
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center space-x-4">
-          <Button 
-            onClick={openCart}
-            variant="outline" 
-            size="icon"
-            className="relative bg-white/80 hover:bg-white border border-gray-200"
-          >
-            <ShoppingCart size={18} />
-            {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 bg-marker-green text-white text-xs rounded-full">
-                {cartItemCount}
-              </span>
-            )}
-          </Button>
+        <div className="md:hidden">
           <Button 
             variant="ghost" 
             size="icon" 
