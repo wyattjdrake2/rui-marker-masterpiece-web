@@ -146,7 +146,7 @@ const Index = () => {
         <div className="bg-marker-green text-white py-2 px-4 text-center font-medium flex items-center justify-between">
           <div className="flex items-center justify-center gap-2">
             <Truck className="h-4 w-4" />
-            <span>LIMITED TIME: Free Express Delivery on All Orders! Ships within 24 hours</span>
+            <span>LIMITED TIME: Free Express Delivery on All Orders!</span>
           </div>
           <CurrencySelector />
         </div>
@@ -172,3 +172,4 @@ const Index = () => {
 };
 
 export default Index;
+
