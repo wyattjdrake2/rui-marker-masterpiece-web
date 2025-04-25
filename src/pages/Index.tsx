@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Toaster } from '@/components/ui/sonner';
 import Navbar from '@/components/Navbar';
@@ -19,12 +18,10 @@ const Index = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
-  // Initialize Shopify functionality
   useEffect(() => {
     if (window.ShopifyBuy) {
       initShopify();
     } else {
-      // The script is already loaded in index.html, but we'll check if it's ready
       const checkInterval = setInterval(() => {
         if (window.ShopifyBuy) {
           clearInterval(checkInterval);
@@ -32,7 +29,6 @@ const Index = () => {
         }
       }, 100);
 
-      // Clear interval after 10 seconds if still not loaded to avoid memory leaks
       setTimeout(() => clearInterval(checkInterval), 10000);
     }
   }, []);
@@ -84,13 +80,11 @@ const Index = () => {
   ];
 
   const addToCart = (product: Product, quantity: number) => {
-    // If the product is already in the cart, show a message
     if (cartItems.some(item => item.id === product.id)) {
       toast.info(`${product.name} is already in your cart`);
       return;
     }
     
-    // Add the product with quantity to cart
     const productWithQuantity = {
       ...product,
       quantity: quantity
@@ -119,7 +113,6 @@ const Index = () => {
     toast.info("Cart cleared");
   };
 
-  // Add smooth scroll behavior
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -142,11 +135,10 @@ const Index = () => {
       <div className="min-h-screen">
         <Toaster position="bottom-right" richColors />
         
-        {/* Free Delivery Banner with Currency Selector */}
         <div className="bg-marker-green text-white py-2 px-4 text-center font-medium flex items-center justify-between">
           <div className="flex items-center justify-center gap-2">
             <Truck className="h-4 w-4" />
-            <span>LIMITED TIME: Free Express Delivery on All Orders!</span>
+            <span>LIMITED TIME: Free Priority Shipping on All Orders! (2-7) Business days</span>
           </div>
           <CurrencySelector />
         </div>
@@ -172,4 +164,3 @@ const Index = () => {
 };
 
 export default Index;
-
