@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,8 +37,15 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
-  const getVariantId = (colors: number) => {
-    switch (colors) {
+  const getVariantId = (item: Product) => {
+    // First check if the product has a specific variantId defined
+    if (item.variantId) {
+      // If item has a variantId, use that directly
+      return `gid://shopify/ProductVariant/${item.variantId}`;
+    }
+    
+    // For products without specific variantId, use the fallback mapping
+    switch (item.colors) {
       case 48:
         return 'gid://shopify/ProductVariant/43717016387618';
       case 60:
@@ -46,6 +54,8 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
         return 'gid://shopify/ProductVariant/43717016453154';
       case 120:
         return 'gid://shopify/ProductVariant/43717016485922';
+      case 168:
+        return 'gid://shopify/ProductVariant/43774039883810';
       default:
         return '';
     }
@@ -61,7 +71,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
       console.log('Created new Shopify checkout:', checkout.id);
       
       const lineItems = cartItems.map(item => ({
-        variantId: getVariantId(item.colors),
+        variantId: getVariantId(item),
         quantity: item.quantity || 1,
       })).filter(item => item.variantId);
       
