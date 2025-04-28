@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,18 +32,35 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setIsCheckingOut(false);
+      }
+    };
+
+    const handlePageShow = () => {
+      setIsCheckingOut(false);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
+
   const subtotal = cartItems.reduce((sum, item) => sum + convertPrice(item.price) * (item.quantity || 1), 0);
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
   const getVariantId = (item: Product) => {
-    // First check if the product has a specific variantId defined
     if (item.variantId) {
-      // If item has a variantId, use that directly
       return `gid://shopify/ProductVariant/${item.variantId}`;
     }
     
-    // For products without specific variantId, use the fallback mapping
     switch (item.colors) {
       case 48:
         return 'gid://shopify/ProductVariant/43717016387618';
@@ -130,16 +146,10 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
   }, [cartItems]);
 
   useEffect(() => {
+    sessionStorage.removeItem('cart_checkout_pending');
     return () => {
       setIsCheckingOut(false);
     };
-  }, []);
-
-  useEffect(() => {
-    const pendingCheckout = sessionStorage.getItem('cart_checkout_pending');
-    if (pendingCheckout === 'true') {
-      sessionStorage.removeItem('cart_checkout_pending');
-    }
   }, []);
 
   if (!isOpen && !animateIn) return null;
