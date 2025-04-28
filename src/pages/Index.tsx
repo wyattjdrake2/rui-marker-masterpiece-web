@@ -81,7 +81,7 @@ const Index = () => {
       id: "5",
       name: "Chen Rui 168 Colors Set",
       description: "Our most comprehensive collection featuring the widest range of colors. Professional-grade markers perfect for advanced artists and studios.",
-      price: 150.00,
+      price: 159.99,
       image: "/lovable-uploads/eedd15ab-e68d-44b0-950e-9d1e12a0c59d.png",
       colors: 168,
       variantId: "43774039883810"
