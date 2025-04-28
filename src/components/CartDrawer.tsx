@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
+import { X, ShoppingBag } from 'lucide-react';
 import { Product } from './ProductCard';
 import { toast } from 'sonner';
-import { useCurrency } from '@/contexts/CurrencyContext';
+import CartItem from './cart/CartItem';
+import CartSummary from './cart/CartSummary';
+import { createNewShopifyCheckout } from '@/utils/shopifyCheckout';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -15,10 +17,16 @@ interface CartDrawerProps {
   updateQuantity: (productId: string, quantity: number) => void;
 }
 
-const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, updateQuantity }: CartDrawerProps) => {
+const CartDrawer = ({ 
+  isOpen, 
+  onClose, 
+  cartItems, 
+  removeFromCart, 
+  clearCart, 
+  updateQuantity 
+}: CartDrawerProps) => {
   const [animateIn, setAnimateIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const { currency, convertPrice } = useCurrency();
 
   useEffect(() => {
     if (isOpen) {
@@ -52,71 +60,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     };
   }, []);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + convertPrice(item.price) * (item.quantity || 1), 0);
-  const tax = subtotal * 0.05;
-  const total = subtotal + tax;
-
-  const getVariantId = (item: Product) => {
-    if (item.variantId) {
-      return `gid://shopify/ProductVariant/${item.variantId}`;
-    }
-    
-    switch (item.colors) {
-      case 48:
-        return 'gid://shopify/ProductVariant/43717016387618';
-      case 60:
-        return 'gid://shopify/ProductVariant/43717016420386';
-      case 80:
-        return 'gid://shopify/ProductVariant/43717016453154';
-      case 120:
-        return 'gid://shopify/ProductVariant/43717016485922';
-      case 168:
-        return 'gid://shopify/ProductVariant/43774039883810';
-      default:
-        return '';
-    }
-  };
-
-  const createNewShopifyCheckout = async () => {
-    if (!window.shopifyClient || cartItems.length === 0) {
-      return null;
-    }
-
-    try {
-      const checkout = await window.shopifyClient.checkout.create();
-      console.log('Created new Shopify checkout:', checkout.id);
-      
-      const lineItems = cartItems.map(item => ({
-        variantId: getVariantId(item),
-        quantity: item.quantity || 1,
-      })).filter(item => item.variantId);
-      
-      if (lineItems.length === 0) {
-        toast.error("No valid items in cart");
-        return null;
-      }
-      
-      const updatedCheckout = await window.shopifyClient.checkout.addLineItems(
-        checkout.id,
-        lineItems
-      );
-      
-      console.log('Added all items to new checkout');
-      return updatedCheckout;
-    } catch (error) {
-      console.error("Error creating new checkout:", error);
-      toast.error("Failed to prepare checkout");
-      return null;
-    }
-  };
-
-  const handleQuantityChange = (productId: string, newQuantity: number) => {
-    if (newQuantity > 0 && newQuantity <= 99) {
-      updateQuantity(productId, newQuantity);
-    }
-  };
-
-  const handleCheckout = useCallback(async () => {
+  const handleCheckout = async () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       return;
@@ -126,7 +70,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
     toast.info("Preparing checkout...");
 
     try {
-      const newCheckout = await createNewShopifyCheckout();
+      const newCheckout = await createNewShopifyCheckout(cartItems);
       
       if (!newCheckout) {
         setIsCheckingOut(false);
@@ -143,7 +87,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
       sessionStorage.removeItem('cart_checkout_pending');
       toast.error("Failed to redirect to checkout");
     }
-  }, [cartItems]);
+  };
 
   useEffect(() => {
     sessionStorage.removeItem('cart_checkout_pending');
@@ -192,108 +136,25 @@ const CartDrawer = ({ isOpen, onClose, cartItems, removeFromCart, clearCart, upd
           ) : (
             <div className="space-y-6">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex gap-4 pb-4 border-b animate-slide-in-right">
-                  <div className="w-20 h-20 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="w-full h-full object-contain p-2"
-                    />
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8" 
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        <Trash2 size={16} className="text-gray-400 hover:text-red-500" />
-                      </Button>
-                    </div>
-                    <p className="text-sm text-gray-500">{item.colors} Colors</p>
-                    <div className="flex justify-between items-center mt-2">
-                      <div className="flex items-center space-x-2">
-                        <Button 
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1)}
-                          disabled={isCheckingOut || (item.quantity || 1) <= 1}
-                        >
-                          <Minus size={14} />
-                        </Button>
-                        
-                        <Input
-                          type="number"
-                          min="1"
-                          max="99"
-                          value={item.quantity || 1}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value);
-                            if (!isNaN(val)) handleQuantityChange(item.id, val);
-                          }}
-                          className="h-7 w-12 text-center p-0"
-                          disabled={isCheckingOut}
-                        />
-                        
-                        <Button 
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7 p-0"
-                          onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1)}
-                          disabled={isCheckingOut || (item.quantity || 1) >= 99}
-                        >
-                          <Plus size={14} />
-                        </Button>
-                      </div>
-                      <div className="font-medium">
-                        {currency === 'CAD' ? 'CAD' : 'USD'} ${(convertPrice(item.price) * (item.quantity || 1)).toFixed(2)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  onRemove={removeFromCart}
+                  onUpdateQuantity={updateQuantity}
+                  isCheckingOut={isCheckingOut}
+                />
               ))}
             </div>
           )}
         </div>
         
         {cartItems.length > 0 && (
-          <div className="p-6 border-t">
-            <div className="space-y-2 mb-6">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal ({currency})</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tax (5%)</span>
-                <span>${tax.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                <span>Total ({currency})</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-            </div>
-            
-            <Button 
-              className="w-full bg-marker-green hover:bg-marker-green/90 btn-animated" 
-              size="lg"
-              onClick={handleCheckout}
-              disabled={isCheckingOut}
-            >
-              {isCheckingOut ? 'Redirecting...' : 'Checkout'}
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              className="w-full mt-2 text-gray-500" 
-              onClick={clearCart}
-              disabled={isCheckingOut}
-            >
-              Clear Cart
-            </Button>
-          </div>
+          <CartSummary 
+            cartItems={cartItems}
+            onCheckout={handleCheckout}
+            onClearCart={clearCart}
+            isCheckingOut={isCheckingOut}
+          />
         )}
       </div>
     </div>
